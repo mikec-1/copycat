@@ -10,11 +10,11 @@ struct ClipManagerApp: App {
     var body: some Scene {
         
         // Defines the app as a Menu Bar Extra (tray icon) rather than a windowed app.
-        MenuBarExtra("Clipboard Manager", systemImage: "doc.on.clipboard") {
+        MenuBarExtra {
             
             // Header View: Displays the app title and current monitoring status
             VStack(alignment: .leading, spacing: 0) {
-                Text("Clipboard Manager")
+                Text("copycat")
                     .font(.headline)
                 
                 if watcher.isMonitoring {
@@ -22,7 +22,7 @@ struct ClipManagerApp: App {
                         .font(.headline)
                         .foregroundColor(.green)
                 } else {
-                    Text("○ Paused")
+                    Text("○ Monitoring Off")
                         .font(.headline)
                         .foregroundColor(.red)
                 }
@@ -73,6 +73,9 @@ struct ClipManagerApp: App {
                 NSApplication.shared.terminate(nil)
             }
             .keyboardShortcut("q")
+        } label: {
+            let imageName = watcher.isMonitoring ? "cat_white_small" : "cat_asleep"
+            Image(imageName)
         }
         
         // The Settings Scene

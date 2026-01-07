@@ -131,7 +131,8 @@ struct GeneralSettingsView: View {
 struct AboutSettingsView: View {
     var body: some View {
         VStack(spacing: 15) {
-            Image(systemName: "doc.on.clipboard")
+            let imageName = "cat_white_full"
+            Image(imageName)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 60, height: 60)
@@ -139,7 +140,7 @@ struct AboutSettingsView: View {
                 .padding(.top, 20)
             
             VStack {
-                Text("Clipboard Manager")
+                Text("copycat")
                     .font(.title2)
                     .fontWeight(.bold)
                 
