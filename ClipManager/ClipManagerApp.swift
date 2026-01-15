@@ -2,18 +2,13 @@ import SwiftUI
 
 @main
 struct ClipManagerApp: App {
-    
-    // The central state object that monitors clipboard changes.
-    // We use @StateObject here to ensure the watcher instance lives for the entire app lifecycle.
     @StateObject private var watcher = ClipboardWatcher()
-    @AppStorage("appTheme") private var appTheme: String = "system"
+    @StateObject private var appState = AppState()
     
     var body: some Scene {
         
-        // Defines the app as a Menu Bar Extra (tray icon) rather than a windowed app.
         MenuBarExtra {
-            
-            // Header View: Displays the app title and current monitoring status
+            //heaer
             VStack(alignment: .leading, spacing: 0) {
                 Text("copycat")
                     .font(.headline)
@@ -32,7 +27,6 @@ struct ClipManagerApp: App {
             
             Divider()
             
-            // Primary Controls
             Button(watcher.isMonitoring ? "Disable Monitoring" : "Enable Monitoring") {
                 watcher.isMonitoring.toggle()
             }
@@ -44,8 +38,6 @@ struct ClipManagerApp: App {
             
             Divider()
             
-            // History List
-            // Displays the most recent clipboard items as clickable buttons
             if watcher.history.isEmpty {
                 Text("No items copied yet")
                     .italic()
@@ -55,7 +47,6 @@ struct ClipManagerApp: App {
                     Button(action: {
                         copyToClipboard(item)
                     }) {
-                        // Truncate long text to keep the menu width reasonable
                         Text(item.prefix(40) + (item.count > 40 ? "..." : ""))
                     }
                 }
@@ -63,8 +54,7 @@ struct ClipManagerApp: App {
             
             Divider()
             
-            // System Actions
-            // SettingsLink automatically connects to the Settings scene defined below
+            //footer
             SettingsLink {
                 Text("Settings...")
             }
@@ -74,30 +64,19 @@ struct ClipManagerApp: App {
                 NSApplication.shared.terminate(nil)
             }
             .keyboardShortcut("q")
-            .preferredColorScheme(selectedScheme)
+            
         } label: {
             let imageName = watcher.isMonitoring ? "cat_white_small" : "cat_asleep"
             Image(imageName)
         }
         
-        // The Settings Scene
-        // This handles the window that appears when Cmd+, is pressed
+        // Settings window
         Settings {
-            SettingsView()
-            .preferredColorScheme(selectedScheme)
+            SettingsView(appState: appState, clipboardWatcher: watcher)
+                .preferredColorScheme(appState.appearance.colorScheme)
         }
     }
     
-    // 4. Helper Logic to convert the String to a ColorScheme
-    var selectedScheme: ColorScheme? {
-        switch appTheme {
-        case "light": return .light
-        case "dark": return .dark
-        default: return nil // 'nil' means System default
-        }
-    }
-    
-    // Helper function to write text back to the system clipboard
     func copyToClipboard(_ text: String) {
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()

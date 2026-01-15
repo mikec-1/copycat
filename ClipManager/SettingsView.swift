@@ -1,73 +1,244 @@
 import SwiftUI
 import ServiceManagement
 
+// MARK: - Settings View
 struct SettingsView: View {
-    @Environment(\.dismiss) var dismiss
+    @ObservedObject var appState: AppState
+    @ObservedObject var clipboardWatcher: ClipboardWatcher
     
+    //window float
     @State private var settingsWindow: NSWindow?
     
     var body: some View {
-        VStack(spacing: 0) {
-            
-            // Primary Content Area
-            TabView {
-                GeneralSettingsView()
-                    .tabItem {
-                        Label("General", systemImage: "gear")
-                    }
-                
-                AboutSettingsView()
-                    .tabItem {
-                        Label("About", systemImage: "info.circle")
-                    }
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            
-            // Fixed Footer
-            ZStack {
-                Color(NSColor.windowBackgroundColor)
-                    .shadow(radius: 0.5)
-                
-                HStack {
-                    Spacer()
-                    Button("Done") {
-                        dismiss()
-                    }
-                    .keyboardShortcut(.defaultAction)
+        TabView {
+            GeneralSettingsView(appState: appState)
+                .tabItem {
+                    Label("General", systemImage: "gear")
                 }
-                .padding(.horizontal, 10)
-            }
-            .frame(height: 50)
+            
+            PrivacySettingsView()
+                .tabItem {
+                    Label("Privacy", systemImage: "hand.raised.fill")
+                }
+            
+            AboutView()
+                .tabItem {
+                    Label("About", systemImage: "info.circle")
+                }
         }
-        .frame(width: 450, height: 250)
+        .frame(width: 500, height: 400)
+        .preferredColorScheme(appState.appearance.colorScheme)
         
-        // --- UPDATED WINDOW LOGIC ---
+        //floating
         .background(WindowAccessor { window in
-            // Capture the window once when created
             self.settingsWindow = window
-            applyWindowSettings(window)
+            configureSettingsWindow(window)
         })
-        // This listens for when the window becomes active (re-opened)
         .onReceive(NotificationCenter.default.publisher(for: NSWindow.didBecomeKeyNotification)) { notification in
             if let window = notification.object as? NSWindow, window == settingsWindow {
-                // Re-apply the settings every time the window wakes up!
-                applyWindowSettings(window)
+                configureSettingsWindow(window)
             }
-        }
-        .onAppear {
-            NSApp.activate(ignoringOtherApps: true)
         }
     }
     
-    // Helper function to apply the "Always on Top" settings
-    private func applyWindowSettings(_ window: NSWindow) {
+    private func configureSettingsWindow(_ window: NSWindow) {
         window.level = .floating
         window.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
+        
+        window.titlebarAppearsTransparent = false
+        window.titleVisibility = .visible
+        window.styleMask.insert(.fullSizeContentView)
+        
         window.orderFrontRegardless()
+        window.standardWindowButton(.miniaturizeButton)?.isHidden = true
+        window.standardWindowButton(.zoomButton)?.isHidden = true
     }
 }
 
-// MARK: - Window Accessor Helper
+// MARK: - General Settings View
+struct GeneralSettingsView: View {
+    @ObservedObject var appState: AppState
+    
+    //connect to UserDefaults direct and its shared with ClipboardWatcher
+    @AppStorage("historyLimit") private var storedLimit: Int = 20
+    
+    @State private var selectedLimit: Int = 20
+    @State private var launchAtLogin: Bool = SMAppService.mainApp.status == .enabled
+    
+    var body: some View {
+        Form {
+            Section {
+                Picker("Appearance", selection: $appState.appearance) {
+                    ForEach(AppState.AppearanceMode.allCases, id: \.self) { mode in
+                        Text(mode.rawValue).tag(mode)
+                    }
+                }
+                .pickerStyle(.segmented)
+            } header: {
+                Text("Appearance")
+            }
+            
+            Section {
+                Toggle("Launch at Login", isOn: $launchAtLogin)
+                    .onChange(of: launchAtLogin) { oldValue, newValue in
+                        if newValue {
+                            try? SMAppService.mainApp.register()
+                        } else {
+                            try? SMAppService.mainApp.unregister()
+                        }
+                    }
+            } header: {
+                Text("Startup")
+            }
+            
+            Section {
+                HStack {
+                    Picker("History Size", selection: $selectedLimit) {
+                        Text("10 items").tag(10)
+                        Text("20 items").tag(20)
+                        Text("50 items").tag(50)
+                        Text("100 items").tag(100)
+                    }
+                    .frame(width: 120)
+                    
+                    Button("Save Limit") {
+                        storedLimit = selectedLimit
+                    }
+                }
+                Text("Older items will automatically be removed if limit is reached.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            } header: {
+                Text("Clipboard History")
+            }
+            
+            Section {
+                VStack(alignment: .leading, spacing: 6) {
+                    ShortcutRow(keys: "⌘⇧V", desc: "Open clipboard menu")
+                    ShortcutRow(keys: "⇧+Click", desc: "Paste as plain text")
+                    ShortcutRow(keys: "⌘+Click", desc: "Pin/Unpin item")
+                    ShortcutRow(keys: "↑↓", desc: "Navigate items")
+                    ShortcutRow(keys: "⏎", desc: "Paste selected item")
+                }
+                .padding(.vertical, 4)
+            } header: {
+                Text("Keyboard Shortcuts")
+            }
+        }
+        .formStyle(.grouped)
+        .padding()
+        .onAppear {
+            selectedLimit = storedLimit
+        }
+    }
+}
+
+// MARK: - Privacy Settings View
+struct PrivacySettingsView: View {
+    @AppStorage("ignorePasswordManagers") private var ignorePasswordManagers: Bool = true
+    
+    var body: some View {
+        Form {
+            Section {
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack(alignment: .top, spacing: 10) {
+                        Image(systemName: "shield.checkered")
+                            .font(.title2)
+                            .foregroundColor(.green)
+                        
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Password Manager Protection")
+                                .font(.headline)
+                            Text("Copycat automatically ignores clipboard content from password managers to keep your passwords secure.")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    
+                    Toggle("Ignore Password Managers", isOn: $ignorePasswordManagers)
+                        .padding(.top, 4)
+                    
+                    Divider()
+                    
+                    Text("Protected Apps:")
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                    
+                    VStack(alignment: .leading, spacing: 6) {
+                        Label("1Password", systemImage: "checkmark.circle.fill").foregroundColor(.green)
+                        Label("LastPass", systemImage: "checkmark.circle.fill").foregroundColor(.green)
+                        Label("macOS Keychain", systemImage: "checkmark.circle.fill").foregroundColor(.green)
+                        Label("Dashlane", systemImage: "checkmark.circle.fill").foregroundColor(.green)
+                    }
+                    .font(.caption)
+                }
+                .padding(.vertical, 8)
+            } header: {
+                Text("Privacy & Security")
+            }
+        }
+        .formStyle(.grouped)
+        .padding()
+    }
+}
+
+// MARK: - About View
+struct AboutView: View {
+    var body: some View {
+        VStack(spacing: 20) {
+            Spacer()
+            
+            Image("cat_white_full")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 100, height: 100)
+                .shadow(radius: 5)
+            
+            VStack(spacing: 8) {
+                Text("Copycat")
+                    .font(.largeTitle)
+                    .bold()
+                
+                Text("Version 1.0.0")
+                    .font(.title3)
+                    .foregroundColor(.secondary)
+                
+                Text("© 2026 Mikey")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            
+            Spacer()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+
+// MARK: - Helper Views
+
+struct ShortcutRow: View {
+    let keys: String
+    let desc: String
+    
+    var body: some View {
+        HStack {
+            Text(keys)
+                .font(.system(.caption, design: .monospaced))
+                .fontWeight(.bold)
+                .foregroundColor(.primary)
+                .padding(.horizontal, 6)
+                .padding(.vertical, 2)
+                .background(Color.primary.opacity(0.1))
+                .cornerRadius(4)
+            
+            Text(desc)
+                .font(.caption)
+                .foregroundColor(.secondary)
+            Spacer()
+        }
+    }
+}
+
 struct WindowAccessor: NSViewRepresentable {
     var callback: (NSWindow) -> Void
 
@@ -82,126 +253,4 @@ struct WindowAccessor: NSViewRepresentable {
     }
 
     func updateNSView(_ nsView: NSView, context: Context) {}
-}
-
-// MARK: - General Settings Tab
-struct GeneralSettingsView: View {
-    @AppStorage("historyLimit") private var storedLimit: Int = 20
-    @State private var selectedLimit: Int = 20
-    @State private var launchAtLogin: Bool = SMAppService.mainApp.status == .enabled
-    
-    @AppStorage("appTheme") private var appTheme: String = "system"
-    
-    private let labelWidth: CGFloat = 100
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack(alignment: .center) {
-                Text("Appearance:")
-                    .frame(width: labelWidth, alignment: .trailing)
-                
-                Picker("", selection: $appTheme) {
-                    Text("System").tag("system")
-                    Text("Light").tag("light")
-                    Text("Dark").tag("dark")
-                }
-                .pickerStyle(.segmented)
-                .frame(width: 200)
-                .padding(.leading, -1.5)
-            }
-            .padding(.bottom, 5)
-//            .padding(.top, 30)
-            
-            Divider().padding(.vertical, 2)
-            
-            // Startup Toggle
-            HStack(alignment: .center) {
-                Text("Startup:")
-                    .frame(width: labelWidth, alignment: .trailing)
-                
-                Toggle("Launch at login", isOn: $launchAtLogin)
-                    .toggleStyle(.switch)
-                    .onChange(of: launchAtLogin) { oldValue, newValue in
-                        if newValue {
-                            try? SMAppService.mainApp.register()
-                        } else {
-                            try? SMAppService.mainApp.unregister()
-                        }
-                    }
-                    .padding(.leading, 5)
-            }
-            
-            Divider().padding(.vertical, 2)
-            
-            // History Limit
-            HStack(alignment: .center) {
-                Text("History Size:")
-                    .frame(width: labelWidth, alignment: .trailing)
-                
-                Picker("", selection: $selectedLimit) {
-                    Text("10 items").tag(10)
-                    Text("20 items").tag(20)
-                    Text("50 items").tag(50)
-                    Text("100 items").tag(100)
-                }
-                .labelsHidden()
-                .frame(width: 120)
-                .padding(.leading, -1.5)
-                
-                // Moved Button here to the right
-                Button("Save Limit") {
-                    storedLimit = selectedLimit
-                }
-                .padding(.leading, 10) // Add a little space between picker and button
-            }
-            
-            Text("Older items will automatically be removed if limit is reached.")
-                .font(.caption)
-                .foregroundColor(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
-                .padding(.leading, labelWidth + 13)
-                .padding(.trailing, 20)
-            
-//            Spacer()
-        }
-        
-        .onAppear {
-            // Sync the local state with the stored value when view loads
-            selectedLimit = storedLimit
-        }
-    }
-}
-
-// MARK: - About Tab
-struct AboutSettingsView: View {
-    var body: some View {
-        VStack(spacing: 15) {
-            let imageName = "cat_white_full"
-            Image(imageName)
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 60, height: 60)
-                .foregroundColor(.accentColor)
-                .padding(.top, 20)
-            
-            Text("A simple, private clipboard history tool.\nMade with SwiftUI.")
-                .font(.body)
-                .multilineTextAlignment(.center)
-                .fixedSize(horizontal: false, vertical: true)
-                .padding(.horizontal)
-            
-            VStack {
-                Text("copycat")
-                    .font(.title2)
-                    .fontWeight(.bold)
-                
-                Text("Version 1.0.0")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                Text("© 2026 Mikey")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-            }
-        }
-    }
 }
