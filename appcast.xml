@@ -1,0 +1,14 @@
+<?xml version="1.0" standalone="yes"?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>copycat</title>
+        <item>
+            <title>2.1.1</title>
+            <pubDate>Fri, 13 Feb 2026 17:07:33 +0100</pubDate>
+            <sparkle:version>80</sparkle:version>
+            <sparkle:shortVersionString>2.1.1</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/mikec-1/copycat/releases/download/v2.1.1/copycat_2.1.1.zip" length="2232962" type="application/octet-stream" sparkle:edSignature="PdYgPO203oJrhP4m2yl+VWNyYQva14I/bRB2WGACSXkAZ+1+jSl5R/3DtbiwQ5tX0Zvzur23zwzkT51yq3HIDg=="/>
+        </item>
+    </channel>
+</rss>

@@ -245,8 +245,27 @@ struct GeneralSettingsView: View {
     @State private var selectedLimit: Int = 20
     @State private var launchAtLogin: Bool = SMAppService.mainApp.status == .enabled
     
+    //sparkle
+    @StateObject private var updaterViewModel = UpdaterViewModel()
+    
     var body: some View {
         Form {
+            
+            Section(header: Text("Updates")) {
+                HStack {
+                    Text("copycat updates automatically, but you can check manually.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    
+                    Spacer()
+                    
+                    Button("Check for Updates") {
+                        updaterViewModel.checkForUpdates()
+                    }
+                    .disabled(!updaterViewModel.canCheckForUpdates)
+                }
+            }
+
             Section(header: Text("Appearance")) {
                 Picker("Appearance", selection: $appState.appearance) {
                     ForEach(AppState.AppearanceMode.allCases, id: \.self) { mode in

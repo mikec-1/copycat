@@ -6,8 +6,14 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		27A07C152F3F81270039749B /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 27A07C142F3F81270039749B /* Sparkle */; };
+		27A07C1B2F3F85940039749B /* appcast.xml in Resources */ = {isa = PBXBuildFile; fileRef = 27A07C1A2F3F85940039749B /* appcast.xml */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
-		27ACDE462F3ECAE6003D1443 /* copycat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = copycat.app; path = /Users/mike/Documents/ClipManager/build/Debug/copycat.app; sourceTree = "<absolute>"; };
+		27A07C192F3F82BC0039749B /* copycat.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = copycat.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		27A07C1A2F3F85940039749B /* appcast.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = appcast.xml; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -23,6 +29,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				27A07C152F3F81270039749B /* Sparkle in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -32,7 +39,9 @@
 		27468B2C2F0ED6C400DDC8D2 = {
 			isa = PBXGroup;
 			children = (
+				27A07C1A2F3F85940039749B /* appcast.xml */,
 				27468B372F0ED6C400DDC8D2 /* ClipManager */,
+				27A07C192F3F82BC0039749B /* copycat.app */,
 			);
 			sourceTree = "<group>";
 		};
@@ -56,9 +65,10 @@
 			);
 			name = ClipManager;
 			packageProductDependencies = (
+				27A07C142F3F81270039749B /* Sparkle */,
 			);
 			productName = ClipManager;
-			productReference = 27ACDE462F3ECAE6003D1443 /* copycat.app */;
+			productReference = 27A07C192F3F82BC0039749B /* copycat.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -85,6 +95,9 @@
 			);
 			mainGroup = 27468B2C2F0ED6C400DDC8D2;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				27A07C132F3F81270039749B /* XCRemoteSwiftPackageReference "Sparkle" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 27468B2C2F0ED6C400DDC8D2;
 			projectDirPath = "";
@@ -100,6 +113,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				27A07C1B2F3F85940039749B /* appcast.xml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -248,7 +262,17 @@
 				DEVELOPMENT_TEAM = AG9N987UCK;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
+				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
+				ENABLE_RESOURCE_ACCESS_USB = NO;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Info.plist;
@@ -260,8 +284,8 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 2.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.mikey.ClipManager;
+				MARKETING_VERSION = 2.1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mikey.copycat;
 				PRODUCT_NAME = copycat;
 				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -270,6 +294,7 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
+				SYMROOT = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
 			};
 			name = Debug;
 		};
@@ -285,7 +310,17 @@
 				DEVELOPMENT_TEAM = AG9N987UCK;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = NO;
+				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
+				ENABLE_RESOURCE_ACCESS_USB = NO;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Info.plist;
@@ -297,8 +332,8 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 2.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.mikey.ClipManager;
+				MARKETING_VERSION = 2.1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mikey.copycat;
 				PRODUCT_NAME = copycat;
 				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -307,6 +342,7 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
+				SYMROOT = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
 			};
 			name = Release;
 		};
@@ -332,6 +368,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		27A07C132F3F81270039749B /* XCRemoteSwiftPackageReference "Sparkle" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sparkle-project/Sparkle";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.8.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		27A07C142F3F81270039749B /* Sparkle */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 27A07C132F3F81270039749B /* XCRemoteSwiftPackageReference "Sparkle" */;
+			productName = Sparkle;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 27468B2D2F0ED6C400DDC8D2 /* Project object */;
 }
